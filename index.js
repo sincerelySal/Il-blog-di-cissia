@@ -84,16 +84,16 @@ function render() {
           </div>
           <div class="post-content">${escapeHTML(p.content)}</div>
           <div class="post-actions">
-            <a onclick="toggleComments(${p.id})">💬 commenti (${(p.comments||[]).length})</a>
-            &nbsp;|&nbsp;
-            <a onclick="deletePost(${p.id})" style="color:#cc6666;">🗑 elimina</a>
-          </div>
-          <div class="comment-box ${commentsOpen}" id="comments-${p.id}">
-            <div class="comment-list">${commentsHTML}</div>
-            <div class="comment-form">
-              <input type="text" id="commentInput-${p.id}" placeholder="lascia un commento..." />
-              <button onclick="addComment(${p.id})">invia</button>
-            </div>
+                <a onclick="toggleComments('${p.id}')">💬 commenti (${(p.comments||[]).length})</a>
+                &nbsp;|&nbsp;
+                <a onclick="deletePost('${p.id}')" style="color:#cc6666;">🗑 elimina</a>
+              </div>
+              <div class="comment-box ${commentsOpen}" id="comments-${p.id}">
+                <div class="comment-list">${commentsHTML}</div>
+                <div class="comment-form">
+                  <input type="text" id="commentInput-${p.id}" placeholder="lascia un commento..." />
+                  <button onclick="addComment('${p.id}')">invia</button>
+                </div>
           </div>
         </div>
       `;
@@ -151,3 +151,7 @@ async function addComment(id) {
 }
 
 render();
+
+window.toggleComments = toggleComments;
+window.deletePost = deletePost;
+window.addComment = addComment;
