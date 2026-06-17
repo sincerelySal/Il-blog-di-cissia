@@ -1,16 +1,32 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    orderBy,
+    query
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
 const monthsIT = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 
-let posts = [
-    {
-        id: 1647000000000,
-        title: "il mio primo post!!1!",
-        mood: "euforico",
-        date: "12 marzo 2003",
-        content: "Finalmente ho un posto tutto mio su internet! Mio cugino mi ha aiutato a fare l'upload via FTP, ci ho messo tre ore perché il modem si è disconnesso due volte. Comunque ciao a tutti quelli che leggono, scrivetemi su MSN se passate di qui.",
-        comments: []
-    },
+let posts = [];
+async function loadPosts() {
+    const q = query(postsRef, orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(q);
 
-];
+    posts = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        comments: doc.data().comments || []
+    }));
+
+    render();
+}
 
 let openComments = {};
 let hits = Math.floor(Math.random() * 4000) + 1337;
@@ -70,28 +86,30 @@ function render() {
     }).join("");
 }
 
-function addPost(e) {
+async function addPost(e) {
     e.preventDefault();
+
     const title = document.getElementById("postTitle").value.trim();
     const content = document.getElementById("postContent").value.trim();
     if (!title || !content) return;
 
-    posts.unshift({
-        id: Date.now(),
+    await addDoc(postsRef, {
         title,
-        date: formatTodayIT(),
         content,
+        date: formatTodayIT(),
+        createdAt: Date.now(),
         comments: []
     });
-    hits += 1;
+
     document.getElementById("postForm").reset();
-    render();
+    await loadPosts();
 }
 
-function deletePost(id) {
-    if (!confirm("Sicuro di voler eliminare questo post? Non c'è un cestino, sparisce per sempre.")) return;
-    posts = posts.filter(p => p.id !== id);
-    render();
+async function deletePost(id) {
+    if (!confirm("Eliminare?")) return;
+
+    await deleteDoc(doc(db, "posts", id));
+    await loadPosts();
 }
 
 function toggleComments(id) {
@@ -99,14 +117,37 @@ function toggleComments(id) {
     render();
 }
 
-function addComment(id) {
+async function addComment(id) {
     const input = document.getElementById(`commentInput-${id}`);
     const text = input.value.trim();
     if (!text) return;
+
     const post = posts.find(p => p.id === id);
-    post.comments.push({ author: "visitatore_anonimo", text });
-    openComments[id] = true;
-    render();
+
+    const updatedComments = [
+        ...(post.comments || []),
+        { author: "visitatore_anonimo", text }
+    ];
+
+    await updateDoc(doc(db, "posts", id), {
+        comments: updatedComments
+    });
+
+    await loadPosts();
 }
 
 render();
+
+document.getElementById("postForm").addEventListener("submit", addPost);
+
+const firebaseConfig = {
+    apiKey: "AIzaSyArZ9h9PejHQN1lUt8fu2u9M5GKTq81yJw",
+    authDomain: "cissias-blog.firebaseapp.com",
+    projectId: "cissias-blog",
+    storageBucket: "cissias-blog.firebasestorage.app",
+    messagingSenderId: "799587159765",
+    appId: "1:799587159765:web:3a1b87982b8df9b40b1c5c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const postsRef = collection(db, "posts");
