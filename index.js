@@ -115,36 +115,4 @@ function addComment(id) {
     render();
 }
 
-function exportPosts() {
-    const data = JSON.stringify(posts, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "diario_di_salva_backup.json";
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function importPosts(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const imported = JSON.parse(e.target.result);
-            if (Array.isArray(imported)) {
-                posts = imported;
-                render();
-            } else {
-                alert("Il file non sembra un backup valido del diario.");
-            }
-        } catch (err) {
-            alert("Errore nel leggere il file: " + err.message);
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = "";
-}
-
 render();
