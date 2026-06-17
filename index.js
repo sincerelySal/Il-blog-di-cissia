@@ -52,9 +52,6 @@ function render() {
             <h2 class="post-title">${escapeHTML(p.title)}</h2>
             ${idx === 0 ? '<span class="new-tag">★ NUOVO ★</span>' : ''}
           </div>
-          <div class="post-meta">
-            pubblicato il ${escapeHTML(p.date)} — mood: <span class="mood-tag">${escapeHTML(p.mood)}</span>
-          </div>
           <div class="post-content">${escapeHTML(p.content)}</div>
           <div class="post-actions">
             <a onclick="toggleComments(${p.id})">💬 commenti (${(p.comments||[]).length})</a>
@@ -76,21 +73,18 @@ function render() {
 function addPost(e) {
     e.preventDefault();
     const title = document.getElementById("postTitle").value.trim();
-    const mood = document.getElementById("postMood").value;
     const content = document.getElementById("postContent").value.trim();
     if (!title || !content) return;
 
     posts.unshift({
         id: Date.now(),
         title,
-        mood,
         date: formatTodayIT(),
         content,
         comments: []
     });
     hits += 1;
     document.getElementById("postForm").reset();
-    document.getElementById("postMood").value = "metallaro";
     render();
 }
 
