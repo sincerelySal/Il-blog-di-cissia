@@ -11,6 +11,20 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+const firebaseConfig = {
+    apiKey: "AIzaSyArZ9h9PejHQN1lUt8fu2u9M5GKTq81yJw",
+    authDomain: "cissias-blog.firebaseapp.com",
+    projectId: "cissias-blog",
+    storageBucket: "cissias-blog.firebasestorage.app",
+    messagingSenderId: "799587159765",
+    appId: "1:799587159765:web:3a1b87982b8df9b40b1c5c"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const postsRef = collection(db, "posts");
+
+document.getElementById("postForm").addEventListener("submit", addPost);
+loadPosts();
 
 const monthsIT = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
 
@@ -137,17 +151,3 @@ async function addComment(id) {
 }
 
 render();
-
-document.getElementById("postForm").addEventListener("submit", addPost);
-
-const firebaseConfig = {
-    apiKey: "AIzaSyArZ9h9PejHQN1lUt8fu2u9M5GKTq81yJw",
-    authDomain: "cissias-blog.firebaseapp.com",
-    projectId: "cissias-blog",
-    storageBucket: "cissias-blog.firebasestorage.app",
-    messagingSenderId: "799587159765",
-    appId: "1:799587159765:web:3a1b87982b8df9b40b1c5c"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const postsRef = collection(db, "posts");
