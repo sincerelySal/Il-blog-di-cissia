@@ -1,0 +1,281 @@
+* { box-sizing: border-box; }
+
+body {
+    background: #000;
+    color: #cfd8cf;
+    font-family: "Times New Roman", Times, serif;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+
+/* effetto schermo CRT, perché siamo nostalgici ma con stile */
+.crt-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+            0deg, rgba(0,0,0,0.25) 0px, rgba(0,0,0,0.25) 1px,
+            transparent 1px, transparent 3px
+    );
+    z-index: 9999;
+}
+
+.wrapper {
+    max-width: 740px;
+    margin: 0 auto;
+    padding: 0 16px 40px;
+    border-left: 2px dashed #2e7d32;
+    border-right: 2px dashed #2e7d32;
+    min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.construction {
+    background: repeating-linear-gradient(45deg, #ffcc00, #ffcc00 10px, #111 10px, #111 20px);
+    color: #000;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    text-align: center;
+    padding: 4px 0;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+.construction span { background:#000; color:#ffcc00; padding:0 6px; }
+
+.marquee-bar {
+    background: #0a0a0a;
+    border-top: 1px solid #39ff6a;
+    border-bottom: 1px solid #39ff6a;
+    padding: 5px 0;
+    margin-bottom: 14px;
+}
+marquee {
+    font-family: "Courier New", monospace;
+    color: #39ff6a;
+    font-size: 0.85rem;
+}
+
+header { text-align: center; padding: 18px 0 6px; }
+h1.title {
+    font-family: "Courier New", monospace;
+    color: #39ff6a;
+    text-shadow: 0 0 6px rgba(57,255,106,0.7);
+    font-size: 2.1rem;
+    letter-spacing: 2px;
+    margin: 0;
+}
+.cursor { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.subtitle {
+    font-family: "Courier New", monospace;
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 4px;
+}
+
+.bio-box {
+    border: 1px dotted #555;
+    background: #0a0a0a;
+    padding: 10px 14px;
+    margin: 14px 0;
+    font-size: 0.9rem;
+    color: #aab;
+}
+.bio-box b { color: #39ff6a; }
+
+.counter-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin: 14px 0;
+    flex-wrap: wrap;
+}
+.counter-box {
+    display: inline-block;
+    background: #001a00;
+    border: 1px solid #39ff6a;
+    padding: 4px 10px;
+    font-family: "Courier New", monospace;
+    color: #39ff6a;
+    letter-spacing: 3px;
+    font-size: 0.85rem;
+}
+.counter-box .label { color: #6f9; letter-spacing: 0; font-size: 0.7rem; display:block; }
+
+nav.tools {
+    text-align: center;
+    margin: 10px 0 4px;
+    font-family: "Courier New", monospace;
+    font-size: 0.8rem;
+}
+nav.tools button {
+    background: #111;
+    color: #39ff6a;
+    border: 1px outset #39ff6a;
+    font-family: "Courier New", monospace;
+    padding: 3px 8px;
+    margin: 0 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+nav.tools button:active { border-style: inset; }
+input[type="file"] { display:none; }
+
+hr.sep {
+    border: none;
+    border-top: 1px dashed #444;
+    margin: 18px 0;
+}
+
+/* ===== FORM NUOVO POST ===== */
+.new-post-box {
+    border: 2px ridge #2e7d32;
+    background: #050505;
+    padding: 16px;
+    margin: 16px 0 26px;
+}
+.new-post-box legend, .new-post-box .legend {
+    font-family: "Courier New", monospace;
+    color: #39ff6a;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.field-row { margin-bottom: 10px; }
+.field-row label {
+    display: block;
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 3px;
+}
+.field-row input[type="text"],
+.field-row select,
+.field-row textarea {
+    width: 100%;
+    background: #0e0e0e;
+    color: #e8e8e8;
+    border: 1px inset #555;
+    font-family: "Times New Roman", serif;
+    font-size: 0.95rem;
+    padding: 6px;
+}
+.field-row textarea { resize: vertical; min-height: 90px; }
+
+.publish-btn {
+    background: #111;
+    color: #39ff6a;
+    border: 2px outset #39ff6a;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    padding: 8px 18px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.publish-btn:active { border-style: inset; }
+
+/* ===== POST ===== */
+.post {
+    border: 1px dotted #555;
+    background: #0a0a0a;
+    padding: 14px 16px;
+    margin: 18px 0;
+}
+.post-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.post-title {
+    color: #d7ffd9;
+    font-size: 1.25rem;
+    margin: 0;
+}
+.new-tag {
+    color: #ff3333;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+    font-size: 0.7rem;
+    animation: blink 0.9s steps(1) infinite;
+}
+.post-meta {
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+    color: #888;
+    margin: 4px 0 10px;
+}
+.mood-tag { color: #cc4444; font-weight: bold; }
+.post-content {
+    line-height: 1.5;
+    color: #cfd8cf;
+    white-space: pre-wrap;
+}
+.post-actions {
+    margin-top: 10px;
+    font-family: "Courier New", monospace;
+    font-size: 0.75rem;
+}
+.post-actions a { cursor: pointer; }
+
+a { color: #66ccff; text-decoration: underline; }
+a:visited { color: #9966cc; }
+
+.comment-box { margin-top: 8px; display:none; }
+.comment-box.open { display:block; }
+.comment-list { margin: 8px 0 0 14px; font-size: 0.85rem; color: #aab; }
+.comment-list .c { border-left: 2px solid #333; padding-left: 8px; margin-bottom: 6px; }
+.comment-form { display:flex; gap:6px; margin-top:6px; }
+.comment-form input {
+    flex: 1;
+    background: #0e0e0e; color:#e8e8e8; border: 1px inset #555; padding: 4px;
+    font-family: "Times New Roman", serif;
+}
+.comment-form button {
+    background:#111; color:#39ff6a; border:1px outset #39ff6a; font-family:"Courier New",monospace; cursor:pointer;
+}
+
+.empty-state {
+    text-align: center;
+    color: #555;
+    font-family: "Courier New", monospace;
+    font-size: 0.85rem;
+    padding: 30px 0;
+}
+
+/* ===== FOOTER / BADGE-MANIA ===== */
+footer {
+    margin-top: 36px;
+    text-align: center;
+    border-top: 1px dashed #444;
+    padding-top: 16px;
+}
+.badges {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.badge {
+    width: 88px;
+    height: 31px;
+    background: #111;
+    border: 1px solid #444;
+    color: #888;
+    font-family: "Courier New", monospace;
+    font-size: 0.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.1;
+}
+footer .signature {
+    font-family: "Courier New", monospace;
+    font-size: 0.7rem;
+    color: #555;
+}

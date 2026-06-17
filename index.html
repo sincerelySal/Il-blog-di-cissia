@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>~*~ dev_journal ~*~</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+<div class="crt-overlay"></div>
+
+<div class="construction">⚠ <span>SITO IN COSTRUZIONE</span></div>
+
+<div class="wrapper">
+
+  <div class="marquee-bar">
+    <marquee behavior="scroll" direction="left" scrollamount="4">
+     ☆ aggiornato quando ho tempo e voglia ☆ niente IE6, grazie ☆ firmate la guestbook (immaginaria) ☆ venite a trovarmi a l'index
+    </marquee>
+  </div>
+
+  <header>
+    <h1 class="title">dev_journal<span class="cursor">_</span></h1>
+    <div class="subtitle">// ultimo aggiornamento: oggi</div>
+  </header>
+
+  <div class="counter-row">
+    <div class="counter-box">
+      <span class="label">visite totali</span>
+      <span id="hitCounter">000000</span>
+    </div>
+    <div class="counter-box">
+      <span class="label">post pubblicati</span>
+      <span id="postCounter">00</span>
+    </div>
+  </div>
+
+  <nav class="tools">
+    <button onclick="exportPosts()">💾 esporta diario (.json)</button>
+    <button onclick="document.getElementById('importInput').click()">📂 importa diario</button>
+    <input type="file" id="importInput" accept=".json" onchange="importPosts(event)" />
+  </nav>
+
+  <hr class="sep" />
+
+  <div class="new-post-box">
+    <div class="legend">&gt; scrivi un nuovo post</div>
+    <form id="postForm" onsubmit="addPost(event)">
+      <div class="field-row">
+        <label for="postTitle">titolo</label>
+        <input type="text" id="postTitle" placeholder="oggi è successa una cosa pazzesca..." required />
+      <div class="field-row">
+        <label for="postContent">contenuto</label>
+        <textarea id="postContent" placeholder="scrivi qui il tuo papiro..." required></textarea>
+      </div>
+      <button type="submit" class="publish-btn">PUBBLICA ▶</button>
+    </form>
+  </div>
+
+  <hr class="sep" />
+
+  <div id="postsList"></div>
+
+  <footer>
+    <div class="badges">
+      <div class="badge">BEST VIEWED<br/>IN 800×600</div>
+      <div class="badge">POWERED BY<br/>VANILLA JS</div>
+      <div class="badge">VALID HTML<br/>(probabilmente)</div>
+    </div>
+    <div class="signature">© 1996-2003 dev_journal — costruito a mano</div>
+  </footer>
+
+</div>
+</body>
+</html>
