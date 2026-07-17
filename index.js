@@ -19,6 +19,8 @@ import {
     updateProfile
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+// ===== FIREBASE SETUP =====
+
 const firebaseConfig = {
     apiKey: "AIzaSyArZ9h9PejHQN1lUt8fu2u9M5GKTq81yJw",
     authDomain: "cissias-blog.firebaseapp.com",
@@ -33,6 +35,25 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const postsRef = collection(db, "posts");
 
+// ===== CONSTANTS =====
+
+const MONTHS_IT = [
+    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
+];
+
+const hits = Math.floor(Math.random() * 4000) + 1337;
+
+// ===== DOM HELPERS =====
+
+function getEl(id) {
+    return document.getElementById(id);
+}
+
+function setDisplay(id, value) {
+    getEl(id).style.display = value;
+}
+
 // ===== AUTH =====
 
 let currentUser = null;
@@ -40,90 +61,111 @@ let currentUser = null;
 onAuthStateChanged(auth, (user) => {
     currentUser = user;
     if (user) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("postBox").style.display = "block";
-        document.getElementById("loggedInAs").textContent =
-            `loggato come: ${user.displayName || user.email}`;
-        document.getElementById("postDate").value = getDefault2003DateISO();
+        setDisplay("loginBox", "none");
+        setDisplay("postBox", "block");
+        getEl("loggedInAs").textContent = `loggato come: ${user.displayName || user.email}`;
+        getEl("postDate").value = getDefault2003DateISO();
     } else {
-        document.getElementById("loginBox").style.display = "block";
-        document.getElementById("postBox").style.display = "none";
+        setDisplay("loginBox", "block");
+        setDisplay("postBox", "none");
     }
 });
 
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    // Use username as a fake email for Firebase Auth
+function getAuthCredentials() {
+    const username = getEl("loginUsername").value.trim();
+    const password = getEl("loginPassword").value.trim();
     const fakeEmail = `${username}@cissia.local`;
-    const errorEl = document.getElementById("authError");
-    errorEl.textContent = "";
+    return { username, password, fakeEmail };
+}
 
+function setAuthError(message) {
+    getEl("authError").textContent = message;
+}
+
+function friendlyAuthError(code) {
+    const errors = {
+        "auth/user-not-found": "username o password errati",
+        "auth/wrong-password": "username o password errati",
+        "auth/invalid-credential": "username o password errati",
+        "auth/email-already-in-use": "username già in uso",
+        "auth/invalid-email": "username non valido",
+        "auth/weak-password": "password troppo corta (min. 6 caratteri)"
+    };
+    return errors[code] ?? code;
+}
+
+getEl("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setAuthError("");
+
+    const { fakeEmail, password } = getAuthCredentials();
     try {
         await signInWithEmailAndPassword(auth, fakeEmail, password);
     } catch (err) {
-        errorEl.textContent = `// errore: ${friendlyAuthError(err.code)}`;
+        setAuthError(`// errore: ${friendlyAuthError(err.code)}`);
     }
 });
 
-document.getElementById("registerBtn").addEventListener("click", async () => {
-    const username = document.getElementById("loginUsername").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    const errorEl = document.getElementById("authError");
-    errorEl.textContent = "";
+getEl("registerBtn").addEventListener("click", async () => {
+    setAuthError("");
 
+    const { username, password, fakeEmail } = getAuthCredentials();
     if (!username || !password) {
-        errorEl.textContent = "// inserisci username e password";
+        setAuthError("// inserisci username e password");
         return;
     }
     if (password.length < 6) {
-        errorEl.textContent = "// la password deve avere almeno 6 caratteri";
+        setAuthError("// la password deve avere almeno 6 caratteri");
         return;
     }
 
-    const fakeEmail = `${username}@cissia.local`;
     try {
         const cred = await createUserWithEmailAndPassword(auth, fakeEmail, password);
         await updateProfile(cred.user, { displayName: username });
-        // Refresh currentUser so displayName is available
         currentUser = auth.currentUser;
-        document.getElementById("loggedInAs").textContent =
-            `loggato come: ${username}`;
+        getEl("loggedInAs").textContent = `loggato come: ${username}`;
     } catch (err) {
-        errorEl.textContent = `// errore: ${friendlyAuthError(err.code)}`;
+        setAuthError(`// errore: ${friendlyAuthError(err.code)}`);
     }
 });
 
-document.getElementById("logoutBtn").addEventListener("click", async () => {
-    await signOut(auth);
-});
+getEl("logoutBtn").addEventListener("click", () => signOut(auth));
 
-function friendlyAuthError(code) {
-    switch (code) {
-        case "auth/user-not-found":
-        case "auth/wrong-password":
-        case "auth/invalid-credential":
-            return "username o password errati";
-        case "auth/email-already-in-use":
-            return "username già in uso";
-        case "auth/invalid-email":
-            return "username non valido";
-        case "auth/weak-password":
-            return "password troppo corta (min. 6 caratteri)";
-        default:
-            return code;
-    }
+// ===== UTILITIES =====
+
+function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function pad(n, len) {
+    return String(n).padStart(len, "0");
+}
+
+function formatDateIT(isoString) {
+    const [year, month, day] = isoString.split("-").map(Number);
+    return `${day} ${MONTHS_IT[month - 1]} ${year}`;
+}
+
+function getDefault2003DateISO() {
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `2003-${month}-${day}`;
+}
+
+function getCurrentUserName() {
+    return currentUser
+        ? (currentUser.displayName || currentUser.email)
+        : "visitatore_anonimo";
 }
 
 // ===== POSTS =====
 
-document.getElementById("postForm").addEventListener("submit", addPost);
-loadPosts();
-
-const monthsIT = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"];
-
 let posts = [];
+let openComments = {};
+
 async function loadPosts() {
     const q = query(postsRef, orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
@@ -137,87 +179,63 @@ async function loadPosts() {
     render();
 }
 
-let openComments = {};
-let hits = Math.floor(Math.random() * 4000) + 1337;
-
-function escapeHTML(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
+function renderCommentHTML(comment) {
+    return `<div class="c"><b>${escapeHTML(comment.author)}:</b> ${escapeHTML(comment.text)}</div>`;
 }
 
-function pad(n, len) {
-    return String(n).padStart(len, "0");
-}
+function renderPostHTML(post, index) {
+    const commentsOpen = openComments[post.id] ? "open" : "";
+    const commentsHTML = (post.comments || []).map(renderCommentHTML).join("");
+    const isNewest = index === 0;
 
-function formatTodayIT() {
-    const d = new Date();
-    return `${d.getDate()} ${monthsIT[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-function formatDateIT(isoString) {
-    const [year, month, day] = isoString.split("-").map(Number);
-    return `${day} ${monthsIT[month - 1]} ${year}`;
-}
-
-function getDefault2003DateISO() {
-    const d = new Date();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `2003-${month}-${day}`;
+    return `
+        <div class="post">
+          <div class="post-title-row">
+            <h2 class="post-title">${escapeHTML(post.title)}</h2>
+            ${isNewest ? '<span class="new-tag">★ NUOVO ★</span>' : ""}
+          </div>
+          <div class="post-meta">
+            posted by <span style="color:#39ff6a;">${escapeHTML(post.author || "anonimo")}</span>
+            &nbsp;·&nbsp; ${escapeHTML(post.date || "")}
+          </div>
+          <div class="post-content">${escapeHTML(post.content)}</div>
+          <div class="post-actions">
+            <a onclick="toggleComments('${post.id}')">💬 commenti (${post.comments.length})</a>
+            &nbsp;|&nbsp;
+            <a onclick="deletePost('${post.id}')" style="color:#cc6666;">🗑 elimina</a>
+          </div>
+          <div class="comment-box ${commentsOpen}" id="comments-${post.id}">
+            <div class="comment-list">${commentsHTML}</div>
+            <div class="comment-form">
+              <input type="text" id="commentInput-${post.id}" placeholder="lascia un commento..." />
+              <button onclick="addComment('${post.id}')">invia</button>
+            </div>
+          </div>
+        </div>
+    `;
 }
 
 function render() {
-    document.getElementById("hitCounter").textContent = pad(hits, 6);
-    document.getElementById("postCounter").textContent = pad(posts.length, 2);
+    getEl("hitCounter").textContent = pad(hits, 6);
+    getEl("postCounter").textContent = pad(posts.length, 2);
 
-    const list = document.getElementById("postsList");
+    const list = getEl("postsList");
+
     if (posts.length === 0) {
         list.innerHTML = `<div class="empty-state">// nessun post ancora. scrivi qualcosa qui sopra //</div>`;
         return;
     }
 
-    list.innerHTML = posts.map((p, idx) => {
-        const commentsOpen = openComments[p.id] ? "open" : "";
-        const commentsHTML = (p.comments || []).map(c =>
-            `<div class="c"><b>${escapeHTML(c.author)}:</b> ${escapeHTML(c.text)}</div>`
-        ).join("");
-
-        return `
-        <div class="post">
-          <div class="post-title-row">
-            <h2 class="post-title">${escapeHTML(p.title)}</h2>
-            ${idx === 0 ? '<span class="new-tag">★ NUOVO ★</span>' : ''}
-          </div>
-          <div class="post-meta">
-            posted by <span style="color:#39ff6a;">${escapeHTML(p.author || "anonimo")}</span>
-            &nbsp;·&nbsp; ${escapeHTML(p.date || "")}
-          </div>
-          <div class="post-content">${escapeHTML(p.content)}</div>
-          <div class="post-actions">
-            <a onclick="toggleComments('${p.id}')">💬 commenti (${(p.comments||[]).length})</a>
-            &nbsp;|&nbsp;
-            <a onclick="deletePost('${p.id}')" style="color:#cc6666;">🗑 elimina</a>
-          </div>
-          <div class="comment-box ${commentsOpen}" id="comments-${p.id}">
-            <div class="comment-list">${commentsHTML}</div>
-            <div class="comment-form">
-              <input type="text" id="commentInput-${p.id}" placeholder="lascia un commento..." />
-              <button onclick="addComment('${p.id}')">invia</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join("");
+    list.innerHTML = posts.map(renderPostHTML).join("");
 }
 
 async function addPost(e) {
     e.preventDefault();
     if (!currentUser) return;
 
-    const title = document.getElementById("postTitle").value.trim();
-    const content = document.getElementById("postContent").value.trim();
-    const dateISO = document.getElementById("postDate").value;
+    const title = getEl("postTitle").value.trim();
+    const content = getEl("postContent").value.trim();
+    const dateISO = getEl("postDate").value;
     if (!title || !content || !dateISO) return;
 
     await addDoc(postsRef, {
@@ -229,8 +247,8 @@ async function addPost(e) {
         comments: []
     });
 
-    document.getElementById("postForm").reset();
-    document.getElementById("postDate").value = getDefault2003DateISO();
+    getEl("postForm").reset();
+    getEl("postDate").value = getDefault2003DateISO();
     await loadPosts();
 }
 
@@ -246,25 +264,24 @@ function toggleComments(id) {
 }
 
 async function addComment(id) {
-    const input = document.getElementById(`commentInput-${id}`);
+    const input = getEl(`commentInput-${id}`);
     const text = input.value.trim();
     if (!text) return;
 
     const post = posts.find(p => p.id === id);
-    const authorName = currentUser
-        ? (currentUser.displayName || currentUser.email)
-        : "visitatore_anonimo";
-
     const updatedComments = [
         ...(post.comments || []),
-        { author: authorName, text }
+        { author: getCurrentUserName(), text }
     ];
 
     await updateDoc(doc(db, "posts", id), { comments: updatedComments });
     await loadPosts();
 }
 
-render();
+// ===== INIT =====
+
+getEl("postForm").addEventListener("submit", addPost);
+loadPosts();
 
 window.toggleComments = toggleComments;
 window.deletePost = deletePost;
