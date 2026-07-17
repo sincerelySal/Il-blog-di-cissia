@@ -217,18 +217,20 @@ async function addPost(e) {
 
     const title = document.getElementById("postTitle").value.trim();
     const content = document.getElementById("postContent").value.trim();
-    if (!title || !content) return;
+    const dateISO = document.getElementById("postDate").value;
+    if (!title || !content || !dateISO) return;
 
     await addDoc(postsRef, {
         title,
         content,
         author: currentUser.displayName || currentUser.email,
-        date: formatTodayIT(),
+        date: formatDateIT(dateISO),
         createdAt: Date.now(),
         comments: []
     });
 
     document.getElementById("postForm").reset();
+    document.getElementById("postDate").value = getDefault2003DateISO();
     await loadPosts();
 }
 
