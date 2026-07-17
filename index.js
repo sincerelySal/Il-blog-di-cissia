@@ -44,6 +44,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById("postBox").style.display = "block";
         document.getElementById("loggedInAs").textContent =
             `loggato come: ${user.displayName || user.email}`;
+        document.getElementById("postDate").value = getDefault2003DateISO();
     } else {
         document.getElementById("loginBox").style.display = "block";
         document.getElementById("postBox").style.display = "none";
@@ -152,6 +153,18 @@ function pad(n, len) {
 function formatTodayIT() {
     const d = new Date();
     return `${d.getDate()} ${monthsIT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function formatDateIT(isoString) {
+    const [year, month, day] = isoString.split("-").map(Number);
+    return `${day} ${monthsIT[month - 1]} ${year}`;
+}
+
+function getDefault2003DateISO() {
+    const d = new Date();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `2003-${month}-${day}`;
 }
 
 function render() {
