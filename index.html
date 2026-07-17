@@ -39,9 +39,33 @@
 
   <hr class="sep" />
 
-  <div class="new-post-box">
-    <div class="legend">&gt; scrivi un nuovo post</div>
-    <form id="postForm" onsubmit="addPost()">
+  <!-- LOGIN BOX (shown when logged out) -->
+  <div class="new-post-box" id="loginBox">
+    <div class="legend">&gt; accedi per postare</div>
+    <form id="loginForm">
+      <div class="field-row">
+        <label for="loginUsername">username</label>
+        <input type="text" id="loginUsername" placeholder="il_tuo_nick" required />
+      </div>
+      <div class="field-row">
+        <label for="loginPassword">password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required />
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+        <button type="submit" class="publish-btn">ACCEDI ▶</button>
+        <button type="button" class="publish-btn" id="registerBtn" style="color:#aaffaa;">REGISTRATI ▶</button>
+      </div>
+      <div id="authError" style="color:#cc6666; font-family:'Courier New',monospace; font-size:0.8rem; margin-top:6px;"></div>
+    </form>
+  </div>
+
+  <!-- POST FORM (shown when logged in) -->
+  <div class="new-post-box" id="postBox" style="display:none;">
+    <div class="legend" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+      <span>&gt; scrivi un nuovo post</span>
+      <span id="loggedInAs" style="color:#888; font-size:0.8rem;"></span>
+    </div>
+    <form id="postForm">
       <div class="field-row">
         <label for="postTitle">titolo</label>
         <input type="text" id="postTitle" placeholder="oggi è successa una cosa pazzesca..." required />
@@ -50,7 +74,10 @@
         <label for="postContent">contenuto</label>
         <textarea id="postContent" placeholder="scrivi qui il tuo papiro..." required></textarea>
       </div>
-      <button type="submit" class="publish-btn">PUBBLICA ▶</button>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button type="submit" class="publish-btn">PUBBLICA ▶</button>
+        <button type="button" class="publish-btn" id="logoutBtn" style="color:#cc6666;">ESCI ✕</button>
+      </div>
     </form>
   </div>
 
